@@ -84,9 +84,32 @@ func GameRender(global, canvas, document js.Value) {
 	shadowFunc = func(ctx js.Value) {
 		utility.SetShadow(30, "#000000")
 	}
-	detailSize := float32(24)
-	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", Multiplier), 0, detailSize, detailSize, "#ffffff", shadowFunc)
 	utility.DrawCenteredFilledText(text, 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float())/2, 48, "#ffffff", shadowFunc)
+
+	detailSize := float32(24)
+	yOffset := detailSize
+	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", Multiplier), 0, yOffset, detailSize, "#ffffff", shadowFunc)
+	yOffset += detailSize
+	AddButton(Button{
+		Func: func() {
+			if Circles >= 50 {
+				Circles -= 50
+				Multiplier++
+				document.Set("title", fmt.Sprintf("%d - Circle Clicker", Circles))
+				storeCookie(document)
+			}
+		},
+		X:      0,
+		Y:      yOffset,
+		Width:  200,
+		Height: 50,
+		ID:     "Multi",
+	})
+	button = GetButton("Multi")
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+	utility.DrawCenteredFilledText("Buy Multiplier 50 Circles", button.X, button.Y, button.Width, button.Height, 12, "#000000")
+	yOffset += button.Height
+
 	utility.EndRender()
 }
 
