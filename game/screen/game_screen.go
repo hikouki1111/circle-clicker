@@ -25,17 +25,19 @@ func GameScreen() *Screen {
 
 func GameOnInit(global, canvas, document js.Value) {
 	cookies := parseCookie(document)
-	if cookies == nil {
-		storeCookie(document)
-	} else {
+	if cookies != nil {
 		i, err := strconv.Atoi(cookies["multiplier"])
-		if err != nil {
+		if err == nil {
 			Multiplier = i
+		} else {
+			fmt.Println(err)
 		}
 
 		i, err = strconv.Atoi(cookies["circles"])
-		if err != nil {
+		if err == nil {
 			Circles = i
+		} else {
+			fmt.Println(err)
 		}
 	}
 }
