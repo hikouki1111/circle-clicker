@@ -39,7 +39,7 @@ func DrawImage(x, y, w, h float32, styleFunc ...func(ctx js.Value)) {
 		f(currentCtx)
 	}
 	img := js.Global().Get("Image").New()
-	img.Set("src", "game/assets/bg.jpg")
+	img.Set("src", "../game/assets/bg.jpg")
 	currentCtx.Call("drawImage", img, x, y, w, h)
 	closePath()
 }

@@ -1,11 +1,11 @@
 @font-face {
     font-family: "Comfortaa";
-    src: url("game/assets/Comfortaa-Regular.ttf") format("truetype");
+    src: url("../game/assets/Comfortaa-Regular.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "ComfortaaB";
-    src: url("game/assets/Comfortaa-Bold.ttf") format("truetype");
+    src: url("../game/assets/Comfortaa-Bold.ttf") format("truetype");
 }
 
 html {
