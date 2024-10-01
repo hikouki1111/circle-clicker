@@ -29,7 +29,7 @@ func EndRender() {
 	currentMode = ""
 }
 
-func DrawImage(x, y, w, h float32, styleFunc ...func(ctx js.Value)) {
+func DrawImage(x, y, w, h float32, src string, styleFunc ...func(ctx js.Value)) {
 	if !isReady() {
 		return
 	}
@@ -39,7 +39,7 @@ func DrawImage(x, y, w, h float32, styleFunc ...func(ctx js.Value)) {
 		f(currentCtx)
 	}
 	img := js.Global().Get("Image").New()
-	img.Set("src", "assets/bg.jpg")
+	img.Set("src", src)
 	currentCtx.Call("drawImage", img, x, y, w, h)
 	closePath()
 }
@@ -51,7 +51,7 @@ func DrawBackground() {
 
 	beginPath()
 	SetFilter("blur(25px)")
-	DrawImage(0, 0, float32(currentCanvas.Get("width").Float()), float32(currentCanvas.Get("height").Float()))
+	DrawImage(0, 0, float32(currentCanvas.Get("width").Float()), float32(currentCanvas.Get("height").Float()), "assets/bg.jpg")
 	closePath()
 }
 

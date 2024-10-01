@@ -2,6 +2,8 @@ package screen
 
 import (
 	"circle-clicker/game/utility"
+	"fmt"
+	"net/url"
 	"syscall/js"
 )
 
@@ -66,6 +68,21 @@ func TitleRender(global, canvas, document js.Value) {
 	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
 	utility.DrawCenteredFilledText("Settings", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
 	yOffset += buttonH + margin
+
+	button = AddButton(Button{
+		Func: func() {
+			parsedURL, err := url.Parse(document.Get("location").Get("href").String())
+			if err == nil {
+				global.Get("navigator").Get("clipboard").Call("writeText", fmt.Sprintf("%s://%s", parsedURL.Scheme, parsedURL.Host))
+			}
+		},
+		X:      margin,
+		Y:      float32(canvas.Get("height").Float()) - (50 + margin),
+		Width:  50,
+		Height: 50,
+		ID:     "Share",
+	})
+	utility.DrawImage(button.X, button.Y, button.Width, button.Height, "assets/share.svg")
 
 	utility.EndRender()
 }
