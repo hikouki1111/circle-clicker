@@ -1,6 +1,7 @@
 package game
 
 import (
+	"circle-clicker/game/item"
 	"circle-clicker/game/screen"
 	"syscall/js"
 )
@@ -28,8 +29,10 @@ func Start() {
 		return nil
 	})
 	global.Call("requestAnimationFrame", tickFunc)
-
 	screen.AddEvents(global, canvas, document)
+
+	item.MultiplierItem().Register()
+	item.ClickerItem().Register()
 }
 
 func resizeCanvas() {

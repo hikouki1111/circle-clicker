@@ -1,16 +1,12 @@
 package screen
 
 import (
+	"circle-clicker/game/item"
 	"circle-clicker/game/utility"
 	"fmt"
 	"strconv"
 	"strings"
 	"syscall/js"
-)
-
-var (
-	Circles    int
-	Multiplier = 1
 )
 
 func GameScreen() *Screen {
@@ -28,14 +24,21 @@ func GameOnInit(global, canvas, document js.Value) {
 	if cookies != nil {
 		i, err := strconv.Atoi(cookies["multiplier"])
 		if err == nil {
-			Multiplier = i
+			item.Multiplier = i
 		} else {
 			fmt.Println(err)
 		}
 
 		i, err = strconv.Atoi(cookies["circles"])
 		if err == nil {
-			Circles = i
+			item.Circles = i
+		} else {
+			fmt.Println(err)
+		}
+
+		i, err = strconv.Atoi(cookies["clickers"])
+		if err == nil {
+			item.Clickers = i
 		} else {
 			fmt.Println(err)
 		}
@@ -51,14 +54,18 @@ func GameOnClick(button int) {
 }
 
 func GameRender(global, canvas, document js.Value) {
+	for _, i := range item.Items {
+		i.OnUpdate()
+	}
+
 	utility.BeginRender(canvas, "2d")
 	circleRadius := float32(150.0)
 	circleX, circleY := utility.GetCenter(circleRadius*2, circleRadius*2)
 
 	AddButton(Button{
 		Func: func() {
-			Circles += Multiplier
-			document.Set("title", fmt.Sprintf("%d - Circle Clicker", Circles))
+			item.Circles += item.Multiplier
+			document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
 			storeCookie(document)
 		},
 		X:      circleX,
@@ -69,7 +76,7 @@ func GameRender(global, canvas, document js.Value) {
 	})
 
 	circleX, circleY = circleX+circleRadius, circleY+circleRadius
-	text := strconv.Itoa(Circles)
+	text := strconv.Itoa(item.Circles)
 	utility.DrawBackground()
 	button := GetButton("Circle")
 	shadowFunc := func(ctx js.Value) {
@@ -87,35 +94,42 @@ func GameRender(global, canvas, document js.Value) {
 	utility.DrawCenteredFilledText(text, 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float())/2, 48, "#ffffff", shadowFunc)
 
 	detailSize := float32(24)
-	yOffset := detailSize
-	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", Multiplier), 0, yOffset, detailSize, "#ffffff", shadowFunc)
-	yOffset += detailSize
-	AddButton(Button{
-		Func: func() {
-			if Circles >= 50 {
-				Circles -= 50
-				Multiplier++
-				document.Set("title", fmt.Sprintf("%d - Circle Clicker", Circles))
-				storeCookie(document)
-			}
-		},
-		X:      0,
-		Y:      yOffset,
-		Width:  200,
-		Height: 50,
-		ID:     "Multi",
-	})
-	button = GetButton("Multi")
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
-	utility.DrawCenteredFilledText("Buy Multiplier 50 Circles", button.X, button.Y, button.Width, button.Height, 12, "#000000")
-	yOffset += button.Height
+	dYOffset := detailSize
+	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", item.Multiplier), 0, dYOffset, detailSize, "#ffffff", shadowFunc)
+	dYOffset += detailSize
+	utility.DrawFilledText(fmt.Sprintf("Clicker %d", item.Clickers), 0, dYOffset, detailSize, "#ffffff", shadowFunc)
+	dYOffset += detailSize
+
+	iYOffset := float32(0)
+	for _, i := range item.Items {
+		AddButton(Button{
+			Func: func() {
+				if item.Circles >= i.Cost {
+					item.Circles -= i.Cost
+					i.OnBuy()
+					document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
+					storeCookie(document)
+				}
+			},
+			X:      float32(canvas.Get("width").Float()) - 200,
+			Y:      iYOffset,
+			Width:  200,
+			Height: 50,
+			ID:     i.Name,
+		})
+		button = GetButton(i.Name)
+		utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+		utility.DrawCenteredFilledText(fmt.Sprintf("●%d %s", i.Cost, i.Name), button.X, button.Y, button.Width, button.Height, 18, "#000000")
+		iYOffset += button.Height + 10
+	}
 
 	utility.EndRender()
 }
 
 func storeCookie(document js.Value) {
-	document.Set("cookie", fmt.Sprintf("multiplier=%d;", Multiplier))
-	document.Set("cookie", fmt.Sprintf("circles=%d;", Circles))
+	document.Set("cookie", fmt.Sprintf("multiplier=%d;", item.Multiplier))
+	document.Set("cookie", fmt.Sprintf("circles=%d;", item.Circles))
+	document.Set("cookie", fmt.Sprintf("clickers=%d;", item.Clickers))
 }
 
 func parseCookie(document js.Value) map[string]string {
