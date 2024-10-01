@@ -5,7 +5,7 @@ var Multiplier = 1
 func MultiplierItem() *Item {
 	return &Item{
 		Name: "Multiplier",
-		Cost: 50,
+		Cost: 500,
 		OnBuy: func() {
 			Multiplier++
 		},

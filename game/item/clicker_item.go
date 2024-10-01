@@ -10,7 +10,7 @@ var (
 func ClickerItem() *Item {
 	return &Item{
 		"Clicker",
-		100,
+		1000,
 		func() {
 			Clickers++
 		},
