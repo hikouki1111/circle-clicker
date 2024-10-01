@@ -67,17 +67,31 @@ func TitleRender(global, canvas, document js.Value) {
 	utility.DrawCenteredFilledText("Settings", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
 	yOffset += buttonH + margin
 
+	xOffset := margin
 	button = AddButton(Button{
 		Func: func() {
 			global.Get("navigator").Get("clipboard").Call("writeText", document.Get("location").Get("href").String())
 		},
-		X:      margin,
+		X:      xOffset,
 		Y:      float32(canvas.Get("height").Float()) - (50 + margin),
 		Width:  50,
 		Height: 50,
 		ID:     "Share",
 	})
 	utility.DrawImage(button.X, button.Y, button.Width, button.Height, "assets/share.svg")
+	xOffset += button.Width + margin
+
+	button = AddButton(Button{
+		Func: func() {
+			global.Get("window").Call("open", "https://github.com/hikouki1111/circle-clicker", "_blank")
+		},
+		X:      xOffset,
+		Y:      float32(canvas.Get("height").Float()) - (50 + margin),
+		Width:  50,
+		Height: 50,
+		ID:     "Github",
+	})
+	utility.DrawImage(button.X, button.Y, button.Width, button.Height, "assets/github-mark-white.svg")
 
 	utility.EndRender()
 }
