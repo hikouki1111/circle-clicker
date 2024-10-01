@@ -17,6 +17,7 @@ func ClickerItem() *Item {
 		func() {
 			if stopwatch.IsFinished(1000, true) {
 				Circles += Clickers * Multiplier
+				TotalCircles += Clickers * Multiplier
 			}
 		},
 	}

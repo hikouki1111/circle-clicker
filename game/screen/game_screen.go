@@ -19,7 +19,15 @@ func GameScreen() *Screen {
 	return &screen
 }
 
+var (
+	lastCircles int
+	waveAnims   []utility.Animation
+)
+
 func GameOnInit(global, canvas, document js.Value) {
+	lastCircles = item.Circles
+	waveAnims = []utility.Animation{}
+
 	cookies := parseCookie(document)
 	if cookies != nil {
 		i, err := strconv.Atoi(cookies["multiplier"])
@@ -42,6 +50,13 @@ func GameOnInit(global, canvas, document js.Value) {
 		} else {
 			fmt.Println(err)
 		}
+
+		i, err = strconv.Atoi(cookies["totalcircles"])
+		if err == nil {
+			item.TotalCircles = i
+		} else {
+			fmt.Println(err)
+		}
 	}
 }
 
@@ -54,19 +69,22 @@ func GameOnClick(button int) {
 }
 
 func GameRender(global, canvas, document js.Value) {
+	document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
+	storeCookie(document)
+	margin := float32(20)
+
 	for _, i := range item.Items {
 		i.OnUpdate()
 	}
 
 	utility.BeginRender(canvas, "2d")
+	utility.DrawBackground()
 	circleRadius := float32(150.0)
 	circleX, circleY := utility.GetCenter(circleRadius*2, circleRadius*2)
-
-	AddButton(Button{
+	button := AddButton(Button{
 		Func: func() {
 			item.Circles += item.Multiplier
-			document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
-			storeCookie(document)
+			item.TotalCircles += item.Multiplier
 		},
 		X:      circleX,
 		Y:      circleY,
@@ -77,8 +95,6 @@ func GameRender(global, canvas, document js.Value) {
 
 	circleX, circleY = circleX+circleRadius, circleY+circleRadius
 	text := strconv.Itoa(item.Circles)
-	utility.DrawBackground()
-	button := GetButton("Circle")
 	shadowFunc := func(ctx js.Value) {
 		utility.SetShadow(30, "#000000")
 	}
@@ -87,6 +103,36 @@ func GameRender(global, canvas, document js.Value) {
 			utility.SetShadow(30, "#ffffff")
 		}
 	}
+
+	for i := range waveAnims {
+		if waveAnims[i].IsFinished() {
+			if len(waveAnims) > 1 {
+				waveAnims = append(waveAnims[:i], waveAnims[i+1:]...)
+			} else {
+				waveAnims = []utility.Animation{}
+			}
+			break
+		}
+
+		if WaveAnimation {
+			utility.DrawCircle(circleX, circleY, waveAnims[i].X, 1, "#ffffff")
+		}
+		waveAnims[i].Update()
+	}
+
+	if lastCircles != item.Circles {
+		waveAnims = append(waveAnims,
+			*utility.NewAnimation(
+				circleRadius,
+				circleRadius,
+				float32(canvas.Get("width").Float()),
+				float32(canvas.Get("width").Float()),
+				5000,
+				utility.LinerMode,
+			),
+		)
+	}
+
 	utility.DrawFilledCircle(circleX, circleY, circleRadius, "#ffffff", shadowFunc)
 	shadowFunc = func(ctx js.Value) {
 		utility.SetShadow(30, "#000000")
@@ -94,42 +140,56 @@ func GameRender(global, canvas, document js.Value) {
 	utility.DrawCenteredFilledText(text, 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float())/2, 48, "#ffffff", shadowFunc)
 
 	detailSize := float32(24)
-	dYOffset := detailSize
-	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", item.Multiplier), 0, dYOffset, detailSize, "#ffffff", shadowFunc)
-	dYOffset += detailSize
-	utility.DrawFilledText(fmt.Sprintf("Clicker %d", item.Clickers), 0, dYOffset, detailSize, "#ffffff", shadowFunc)
-	dYOffset += detailSize
+	dYOffset := detailSize + margin
+	utility.DrawFilledText(fmt.Sprintf("Multiplier %d", item.Multiplier), margin, dYOffset, detailSize, "#ffffff", shadowFunc)
+	dYOffset += detailSize + margin
+	utility.DrawFilledText(fmt.Sprintf("Clicker %d", item.Clickers), margin, dYOffset, detailSize, "#ffffff", shadowFunc)
+	dYOffset += detailSize + margin
 
-	iYOffset := float32(0)
+	buttonW, buttonH := float32(250), float32(50)
+	button = AddButton(Button{
+		Func: func() {
+			TitleScreen().SetScreen(global, canvas, document)
+		},
+		X:      margin,
+		Y:      (float32(canvas.Get("height").Float()) - buttonH) - margin,
+		Width:  buttonW,
+		Height: buttonH,
+		ID:     "Back",
+	})
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+	utility.DrawCenteredFilledText(button.ID, button.X, button.Y, button.Width, button.Height, 24, "#000000")
+
+	iYOffset := margin
 	for _, i := range item.Items {
 		AddButton(Button{
 			Func: func() {
 				if item.Circles >= i.Cost {
 					item.Circles -= i.Cost
 					i.OnBuy()
-					document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
-					storeCookie(document)
 				}
 			},
-			X:      float32(canvas.Get("width").Float()) - 200,
+			X:      (float32(canvas.Get("width").Float()) - buttonW) - margin,
 			Y:      iYOffset,
-			Width:  200,
-			Height: 50,
+			Width:  buttonW,
+			Height: buttonH,
 			ID:     i.Name,
 		})
 		button = GetButton(i.Name)
 		utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
-		utility.DrawCenteredFilledText(fmt.Sprintf("●%d %s", i.Cost, i.Name), button.X, button.Y, button.Width, button.Height, 18, "#000000")
-		iYOffset += button.Height + 10
+		utility.DrawCenteredFilledText(fmt.Sprintf("O%d %s", i.Cost, i.Name), button.X, button.Y, button.Width, button.Height, 18, "#000000")
+		iYOffset += button.Height + margin
 	}
 
 	utility.EndRender()
+	lastCircles = item.Circles
 }
 
 func storeCookie(document js.Value) {
 	document.Set("cookie", fmt.Sprintf("multiplier=%d;", item.Multiplier))
 	document.Set("cookie", fmt.Sprintf("circles=%d;", item.Circles))
 	document.Set("cookie", fmt.Sprintf("clickers=%d;", item.Clickers))
+	document.Set("cookie", fmt.Sprintf("totalcircles=%d;", item.TotalCircles))
 }
 
 func parseCookie(document js.Value) map[string]string {

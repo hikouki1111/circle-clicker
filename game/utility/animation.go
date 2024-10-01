@@ -64,3 +64,7 @@ func (a *Animation) Update() {
 	a.X = Lerp(a.StartX, a.GoalX, progress)
 	a.Y = Lerp(a.StartY, a.GoalY, progress)
 }
+
+func (a *Animation) IsFinished() bool {
+	return a.X == a.GoalX && a.Y == a.GoalY
+}

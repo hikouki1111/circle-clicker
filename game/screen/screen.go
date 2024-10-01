@@ -14,18 +14,19 @@ var (
 type Screen struct {
 	Render  func(global, canvas, document js.Value)
 	OnInit  func(global, canvas, document js.Value)
-	OnClick func(pressed int)
+	OnClick func(button int)
 }
 
-func AddButton(button Button) {
+func AddButton(button Button) *Button {
 	for i := range Buttons {
 		if Buttons[i].ID == button.ID {
 			Buttons[i] = button
-			return
+			return &button
 		}
 	}
 
 	Buttons = append(Buttons, button)
+	return &button
 }
 
 func RemoveButton(id string) {

@@ -16,6 +16,7 @@ func TitleScreen() *Screen {
 }
 
 func TitleOnInit(global, canvas, document js.Value) {
+	document.Set("title", "Circle Clicker")
 }
 
 func TitleOnClick(button int) {
@@ -32,12 +33,13 @@ func TitleRender(global, canvas, document js.Value) {
 	titleSize := float32(70)
 	margin := float32(20)
 	x, y := utility.GetCenter(buttonW, buttonH)
-	AddButton(Button{
+	yOffset := titleSize + margin
+	button := AddButton(Button{
 		Func: func() {
 			GameScreen().SetScreen(global, canvas, document)
 		},
 		X:      x,
-		Y:      y + (titleSize + margin),
+		Y:      y + yOffset,
 		Width:  buttonW,
 		Height: buttonH,
 		ID:     "Start",
@@ -46,8 +48,24 @@ func TitleRender(global, canvas, document js.Value) {
 		utility.SetShadow(30, "#000000")
 	}
 	utility.DrawBackground()
-	utility.DrawFilledRoundedRect(x, y+(titleSize+margin), buttonW, buttonH, 24, "#ffffff", shadowFunc)
-	utility.DrawCenteredFilledText("Click to continue", x, y+(titleSize+margin), buttonW, buttonH, 24, "#000000", shadowFunc)
 	utility.DrawCenteredFilledText("Circle Clicker", 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float()), titleSize, "#ffffff", shadowFunc)
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+	utility.DrawCenteredFilledText("Click to continue", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
+	yOffset += buttonH + margin
+
+	button = AddButton(Button{
+		Func: func() {
+			SettingsScreen().SetScreen(global, canvas, document)
+		},
+		X:      x,
+		Y:      y + yOffset,
+		Width:  buttonW,
+		Height: buttonH,
+		ID:     "Settings",
+	})
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+	utility.DrawCenteredFilledText("Settings", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
+	yOffset += buttonH + margin
+
 	utility.EndRender()
 }

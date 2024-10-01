@@ -1,8 +1,9 @@
 package item
 
 var (
-	Items   []Item
-	Circles int
+	Items        []Item
+	Circles      int
+	TotalCircles int
 )
 
 type Item struct {
