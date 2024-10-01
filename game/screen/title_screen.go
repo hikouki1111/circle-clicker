@@ -2,7 +2,6 @@ package screen
 
 import (
 	"circle-clicker/game/utility"
-	"strings"
 	"syscall/js"
 )
 
@@ -70,7 +69,7 @@ func TitleRender(global, canvas, document js.Value) {
 
 	button = AddButton(Button{
 		Func: func() {
-			global.Get("navigator").Get("clipboard").Call("writeText", strings.Replace(document.Get("location").Get("href").String(), "/page", "", 1))
+			global.Get("navigator").Get("clipboard").Call("writeText", document.Get("location").Get("href").String())
 		},
 		X:      margin,
 		Y:      float32(canvas.Get("height").Float()) - (50 + margin),
