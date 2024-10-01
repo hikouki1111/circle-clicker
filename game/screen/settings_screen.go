@@ -5,7 +5,10 @@ import (
 	"syscall/js"
 )
 
-var WaveAnimation = true
+var (
+	WaveAnimation    = true
+	CountUPAnimation = true
+)
 
 func SettingsScreen() *Screen {
 	return &Screen{
@@ -49,6 +52,23 @@ func SettingsRender(global, canvas, document js.Value) {
 	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", shadowFunc)
 	utility.DrawFilledText(button.ID, button.X+button.Width+margin, button.Y+button.Height/1.5, 24, "#ffffff")
 	if WaveAnimation {
+		utility.DrawCenteredFilledText("O", button.X, button.Y, button.Width, button.Height, 24, "#000000")
+	}
+	yOffset += button.Width + margin
+
+	button = AddButton(Button{
+		Func: func() {
+			CountUPAnimation = !CountUPAnimation
+		},
+		X:      margin,
+		Y:      yOffset,
+		Width:  buttonW,
+		Height: buttonH,
+		ID:     "Count UP Animation",
+	})
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", shadowFunc)
+	utility.DrawFilledText(button.ID, button.X+button.Width+margin, button.Y+button.Height/1.5, 24, "#ffffff")
+	if CountUPAnimation {
 		utility.DrawCenteredFilledText("O", button.X, button.Y, button.Width, button.Height, 24, "#000000")
 	}
 	yOffset += button.Width + margin

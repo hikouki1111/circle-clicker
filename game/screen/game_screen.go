@@ -22,11 +22,13 @@ func GameScreen() *Screen {
 var (
 	lastCircles int
 	waveAnims   []utility.Animation
+	cntUPAnims  []utility.Animation
 )
 
 func GameOnInit(global, canvas, document js.Value) {
 	lastCircles = item.Circles
 	waveAnims = []utility.Animation{}
+	cntUPAnims = []utility.Animation{}
 
 	cookies := parseCookie(document)
 	if cookies != nil {
@@ -85,6 +87,16 @@ func GameRender(global, canvas, document js.Value) {
 		Func: func() {
 			item.Circles += item.Multiplier
 			item.TotalCircles += item.Multiplier
+			cntUPAnims = append(cntUPAnims,
+				*utility.NewAnimation(
+					MouseX,
+					MouseY,
+					MouseX,
+					MouseY-250,
+					1000,
+					utility.LinerMode,
+				),
+			)
 		},
 		X:      circleX,
 		Y:      circleY,
@@ -104,23 +116,7 @@ func GameRender(global, canvas, document js.Value) {
 		}
 	}
 
-	for i := range waveAnims {
-		if waveAnims[i].IsFinished() {
-			if len(waveAnims) > 1 {
-				waveAnims = append(waveAnims[:i], waveAnims[i+1:]...)
-			} else {
-				waveAnims = []utility.Animation{}
-			}
-			break
-		}
-
-		if WaveAnimation {
-			utility.DrawCircle(circleX, circleY, waveAnims[i].X, 1, "#ffffff")
-		}
-		waveAnims[i].Update()
-	}
-
-	if lastCircles != item.Circles {
+	if lastCircles < item.Circles {
 		waveAnims = append(waveAnims,
 			*utility.NewAnimation(
 				circleRadius,
@@ -134,6 +130,7 @@ func GameRender(global, canvas, document js.Value) {
 	}
 
 	utility.DrawFilledCircle(circleX, circleY, circleRadius, "#ffffff", shadowFunc)
+	updateAnims(circleX, circleY)
 	shadowFunc = func(ctx js.Value) {
 		utility.SetShadow(30, "#000000")
 	}
@@ -209,4 +206,42 @@ func parseCookie(document js.Value) map[string]string {
 	}
 
 	return cookies
+}
+
+func updateAnims(circleX, circleY float32) {
+	for i, a := range waveAnims {
+		if WaveAnimation {
+			utility.DrawCircle(circleX, circleY, a.X, 1, "#ffffff")
+		}
+
+		if len(waveAnims) > i {
+			if a.IsFinished() {
+				if len(waveAnims) > 1 {
+					waveAnims = append(waveAnims[:i], waveAnims[i+1:]...)
+				} else {
+					waveAnims = []utility.Animation{}
+				}
+			} else {
+				waveAnims[i].Update()
+			}
+		}
+	}
+
+	for i, a := range cntUPAnims {
+		if CountUPAnimation {
+			utility.DrawFilledText(fmt.Sprintf("+%d", item.Multiplier), a.X, a.Y, 48, "#000000")
+		}
+
+		if len(cntUPAnims) > i {
+			if a.IsFinished() {
+				if len(cntUPAnims) > 1 {
+					cntUPAnims = append(cntUPAnims[:i], cntUPAnims[i+1:]...)
+				} else {
+					cntUPAnims = []utility.Animation{}
+				}
+			} else {
+				cntUPAnims[i].Update()
+			}
+		}
+	}
 }
