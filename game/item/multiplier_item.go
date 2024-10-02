@@ -5,8 +5,8 @@ var Multiplier = 1
 func MultiplierItem() *Item {
 	i := &Item{
 		Name:     "Multiplier",
-		InitCost: 400,
-		Cost:     400,
+		InitCost: 100,
+		Cost:     100,
 	}
 
 	i.OnBuy = func() bool {
@@ -21,7 +21,7 @@ func MultiplierItem() *Item {
 	}
 
 	i.OnUpdate = func() {
-		i.Cost = Multiplier * i.InitCost
+		i.Cost = Multiplier * (i.InitCost*2)
 	}
 
 	return i
