@@ -5,7 +5,6 @@ import (
 	"circle-clicker/game/utility"
 	"fmt"
 	"strconv"
-	"strings"
 	"syscall/js"
 )
 
@@ -35,7 +34,7 @@ func GameOnInit(global, canvas, document js.Value) {
 		int
 	}{}
 
-	cookies := parseCookie(document)
+	cookies := utility.ParseCookie(document)
 	if cookies != nil {
 		i, err := strconv.Atoi(cookies["multiplier"])
 		if err == nil {
@@ -57,12 +56,12 @@ func GameOnInit(global, canvas, document js.Value) {
 			item.TotalCircles = i
 		}
 
-		b, err := parseBool(cookies["waveanimation"])
+		b, err := utility.ParseBool(cookies["waveanimation"])
 		if err == nil {
 			WaveAnimation = b
 		}
 
-		b, err = parseBool(cookies["countupanimation"])
+		b, err = utility.ParseBool(cookies["countupanimation"])
 		if err == nil {
 			CountUPAnimation = b
 		}
@@ -80,7 +79,7 @@ func GameOnClick(button int) {
 
 func GameRender(global, canvas, document js.Value) {
 	document.Set("title", fmt.Sprintf("%d - Circle Clicker", item.Circles))
-	storeCookie(document)
+	storeGameCookie(document)
 	margin := float32(20)
 
 	for _, i := range item.Items {
@@ -203,43 +202,13 @@ func GameRender(global, canvas, document js.Value) {
 	lastCircles = item.Circles
 }
 
-func storeCookie(document js.Value) {
+func storeGameCookie(document js.Value) {
 	document.Set("cookie", fmt.Sprintf("multiplier=%d;", item.Multiplier))
 	document.Set("cookie", fmt.Sprintf("circles=%d;", item.Circles))
 	document.Set("cookie", fmt.Sprintf("clickers=%d;", item.Clickers))
 	document.Set("cookie", fmt.Sprintf("totalcircles=%d;", item.TotalCircles))
 	document.Set("cookie", fmt.Sprintf("waveanimation=%t;", WaveAnimation))
 	document.Set("cookie", fmt.Sprintf("countupanimation=%t;", CountUPAnimation))
-}
-
-func parseCookie(document js.Value) map[string]string {
-	cookieStr := document.Get("cookie").String()
-	cookies := map[string]string{}
-
-	if cookieStr == "" {
-		return nil
-	}
-
-	cookieArray := strings.Split(cookieStr, "; ")
-	for _, cookie := range cookieArray {
-		pair := strings.SplitN(cookie, "=", 2)
-		if len(pair) == 2 {
-			cookies[pair[0]] = pair[1]
-		}
-	}
-
-	return cookies
-}
-
-func parseBool(boolStr string) (bool, error) {
-	boolStr = strings.ToLower(boolStr)
-	if boolStr == "true" {
-		return true, nil
-	} else if boolStr == "false" {
-		return false, nil
-	}
-
-	return false, fmt.Errorf("error")
 }
 
 func updateAnims() {

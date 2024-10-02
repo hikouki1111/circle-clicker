@@ -2,6 +2,7 @@ package screen
 
 import (
 	"circle-clicker/game/utility"
+	"fmt"
 	"syscall/js"
 )
 
@@ -19,7 +20,18 @@ func SettingsScreen() *Screen {
 }
 
 func SettingsOnInit(global, canvas, document js.Value) {
+	cookies := utility.ParseCookie(document)
+	if cookies != nil {
+		b, err := utility.ParseBool(cookies["waveanimation"])
+		if err == nil {
+			WaveAnimation = b
+		}
 
+		b, err = utility.ParseBool(cookies["countupanimation"])
+		if err == nil {
+			CountUPAnimation = b
+		}
+	}
 }
 
 func SettingsOnClick(button int) {
@@ -31,6 +43,8 @@ func SettingsOnClick(button int) {
 }
 
 func SettingsRender(global, canvas, document js.Value) {
+	storeSettingsCookie(document)
+
 	utility.BeginRender(canvas, "2d")
 	margin := float32(20)
 	utility.DrawBackground()
@@ -85,4 +99,9 @@ func SettingsRender(global, canvas, document js.Value) {
 	utility.DrawCenteredFilledText(button.ID, button.X, button.Y, button.Width, button.Height, 24, "#000000")
 
 	utility.EndRender()
+}
+
+func storeSettingsCookie(document js.Value) {
+	document.Set("cookie", fmt.Sprintf("waveanimation=%t;", WaveAnimation))
+	document.Set("cookie", fmt.Sprintf("countupanimation=%t;", CountUPAnimation))
 }
