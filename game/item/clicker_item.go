@@ -10,8 +10,8 @@ var (
 func ClickerItem() *Item {
 	i := &Item{
 		Name:     "Clicker",
-		InitCost: 300,
-		Cost:     300,
+		InitCost: 50,
+		Cost:     50,
 	}
 
 	i.OnBuy = func() bool {
@@ -26,7 +26,7 @@ func ClickerItem() *Item {
 	}
 
 	i.OnUpdate = func() {
-		i.Cost = (Clickers + 1) * i.InitCost
+		i.Cost = (Clickers + 1) * (i.InitCost*2)
 		if stopwatch.IsFinished(1000, true) {
 			Circles += Clickers * Multiplier
 			TotalCircles += Clickers * Multiplier
