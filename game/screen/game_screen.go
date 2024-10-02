@@ -22,13 +22,18 @@ func GameScreen() *Screen {
 var (
 	lastCircles int
 	waveAnims   []utility.Animation
-	cntUPAnims  []utility.Animation
+	cntUPAnims  []struct {
+		utility.Animation
+		int
+	}
 )
 
 func GameOnInit(global, canvas, document js.Value) {
-	lastCircles = item.Circles
 	waveAnims = []utility.Animation{}
-	cntUPAnims = []utility.Animation{}
+	cntUPAnims = []struct {
+		utility.Animation
+		int
+	}{}
 
 	cookies := parseCookie(document)
 	if cookies != nil {
@@ -60,6 +65,7 @@ func GameOnInit(global, canvas, document js.Value) {
 			fmt.Println(err)
 		}
 	}
+	lastCircles = item.Circles
 }
 
 func GameOnClick(button int) {
@@ -87,16 +93,6 @@ func GameRender(global, canvas, document js.Value) {
 		Func: func() {
 			item.Circles += item.Multiplier
 			item.TotalCircles += item.Multiplier
-			cntUPAnims = append(cntUPAnims,
-				*utility.NewAnimation(
-					MouseX,
-					MouseY,
-					MouseX,
-					MouseY-250,
-					1000,
-					utility.LinerMode,
-				),
-			)
 		},
 		X:      circleX,
 		Y:      circleY,
@@ -126,6 +122,23 @@ func GameRender(global, canvas, document js.Value) {
 				5000,
 				utility.LinerMode,
 			),
+		)
+
+		cntUPAnims = append(cntUPAnims,
+			struct {
+				utility.Animation
+				int
+			}{
+				*utility.NewAnimation(
+					MouseX,
+					MouseY,
+					MouseX,
+					MouseY-250,
+					1000,
+					utility.LinerMode,
+				),
+				item.Circles - lastCircles,
+			},
 		)
 	}
 
@@ -231,17 +244,20 @@ func updateAnims(circleX, circleY float32) {
 		}
 	}
 
-	for i, a := range cntUPAnims {
+	for i, m := range cntUPAnims {
 		if CountUPAnimation {
-			utility.DrawFilledText(fmt.Sprintf("+%d", item.Multiplier), a.X, a.Y, 48, "#000000")
+			utility.DrawFilledText(fmt.Sprintf("+%d", m.int), m.X, m.Y, 48, "#000000")
 		}
 
 		if len(cntUPAnims) > i {
-			if a.IsFinished() {
+			if m.IsFinished() {
 				if len(cntUPAnims) > 1 {
 					cntUPAnims = append(cntUPAnims[:i], cntUPAnims[i+1:]...)
 				} else {
-					cntUPAnims = []utility.Animation{}
+					cntUPAnims = []struct {
+						utility.Animation
+						int
+					}{}
 				}
 			} else {
 				cntUPAnims[i].Update()
