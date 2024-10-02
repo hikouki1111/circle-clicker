@@ -8,9 +8,10 @@ var (
 
 type Item struct {
 	Name     string
+	InitCost int
 	Cost     int
-	OnBuy    func()
-	OnUpdate func()
+	OnBuy    func(i *Item)
+	OnUpdate func(i *Item)
 }
 
 func (i *Item) Register() {

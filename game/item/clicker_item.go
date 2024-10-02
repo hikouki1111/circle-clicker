@@ -10,11 +10,13 @@ var (
 func ClickerItem() *Item {
 	return &Item{
 		"Clicker",
-		1000,
-		func() {
+		300,
+		300,
+		func(i *Item) {
 			Clickers++
 		},
-		func() {
+		func(i *Item) {
+			i.Cost = (Clickers + 1) * i.InitCost
 			if stopwatch.IsFinished(1000, true) {
 				Circles += Clickers * Multiplier
 				TotalCircles += Clickers * Multiplier

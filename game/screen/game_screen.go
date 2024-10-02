@@ -75,8 +75,8 @@ func GameRender(global, canvas, document js.Value) {
 	storeCookie(document)
 	margin := float32(20)
 
-	for _, i := range item.Items {
-		i.OnUpdate()
+	for idx, i := range item.Items {
+		i.OnUpdate(&item.Items[idx])
 	}
 
 	utility.BeginRender(canvas, "2d")
@@ -158,12 +158,12 @@ func GameRender(global, canvas, document js.Value) {
 	utility.DrawCenteredFilledText(button.ID, button.X, button.Y, button.Width, button.Height, 24, "#000000")
 
 	iYOffset := margin
-	for _, i := range item.Items {
+	for idx, i := range item.Items {
 		AddButton(Button{
 			Func: func() {
 				if item.Circles >= i.Cost {
 					item.Circles -= i.Cost
-					i.OnBuy()
+					i.OnBuy(&item.Items[idx])
 				}
 			},
 			X:      (float32(canvas.Get("width").Float()) - buttonW) - margin,
