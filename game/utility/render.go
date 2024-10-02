@@ -246,6 +246,17 @@ func GetRectCenter(rx, ry, rw, rh, w, h float32) (x, y float32) {
 	return centerX - w/2, centerY - h/2
 }
 
+func GetSF(hovered bool) func(ctx js.Value) {
+	return func(ctx js.Value) {
+		fillStyle := "#000000"
+		if hovered {
+			fillStyle = "#ffffff"
+		}
+
+		SetShadow(30, fillStyle)
+	}
+}
+
 func GetFontSize(text string, size float32) (w, h float32) {
 	if !isReady() {
 		return

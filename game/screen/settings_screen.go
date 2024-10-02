@@ -33,9 +33,6 @@ func SettingsOnClick(button int) {
 func SettingsRender(global, canvas, document js.Value) {
 	utility.BeginRender(canvas, "2d")
 	margin := float32(20)
-	shadowFunc := func(ctx js.Value) {
-		utility.SetShadow(30, "#000000")
-	}
 	utility.DrawBackground()
 	buttonW, buttonH := float32(50), float32(50)
 	yOffset := margin
@@ -49,7 +46,7 @@ func SettingsRender(global, canvas, document js.Value) {
 		Height: buttonH,
 		ID:     "Wave Animation",
 	})
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", shadowFunc)
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", utility.GetSF(button.IsHovered()))
 	utility.DrawFilledText(button.ID, button.X+button.Width+margin, button.Y+button.Height/1.5, 24, "#ffffff")
 	if WaveAnimation {
 		utility.DrawCenteredFilledText("O", button.X, button.Y, button.Width, button.Height, 24, "#000000")
@@ -66,7 +63,7 @@ func SettingsRender(global, canvas, document js.Value) {
 		Height: buttonH,
 		ID:     "Count UP Animation",
 	})
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", shadowFunc)
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 5, "#ffffff", utility.GetSF(button.IsHovered()))
 	utility.DrawFilledText(button.ID, button.X+button.Width+margin, button.Y+button.Height/1.5, 24, "#ffffff")
 	if CountUPAnimation {
 		utility.DrawCenteredFilledText("O", button.X, button.Y, button.Width, button.Height, 24, "#000000")
@@ -84,7 +81,7 @@ func SettingsRender(global, canvas, document js.Value) {
 		Height: buttonH,
 		ID:     "Back",
 	})
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", utility.GetSF(button.IsHovered()))
 	utility.DrawCenteredFilledText(button.ID, button.X, button.Y, button.Width, button.Height, 24, "#000000")
 
 	utility.EndRender()

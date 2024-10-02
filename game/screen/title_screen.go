@@ -44,13 +44,10 @@ func TitleRender(global, canvas, document js.Value) {
 		Height: buttonH,
 		ID:     "Start",
 	})
-	shadowFunc := func(ctx js.Value) {
-		utility.SetShadow(30, "#000000")
-	}
 	utility.DrawBackground()
-	utility.DrawCenteredFilledText("Circle Clicker", 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float()), titleSize, "#ffffff", shadowFunc)
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
-	utility.DrawCenteredFilledText("Click to continue", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
+	utility.DrawCenteredFilledText("Circle Clicker", 0, 0, float32(canvas.Get("width").Float()), float32(canvas.Get("height").Float()), titleSize, "#ffffff")
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", utility.GetSF(button.IsHovered()))
+	utility.DrawCenteredFilledText("Click to continue", button.X, button.Y, button.Width, button.Height, 24, "#000000")
 	yOffset += buttonH + margin
 
 	button = AddButton(Button{
@@ -63,8 +60,8 @@ func TitleRender(global, canvas, document js.Value) {
 		Height: buttonH,
 		ID:     "Settings",
 	})
-	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", shadowFunc)
-	utility.DrawCenteredFilledText("Settings", button.X, button.Y, button.Width, button.Height, 24, "#000000", shadowFunc)
+	utility.DrawFilledRoundedRect(button.X, button.Y, button.Width, button.Height, 24, "#ffffff", utility.GetSF(button.IsHovered()))
+	utility.DrawCenteredFilledText("Settings", button.X, button.Y, button.Width, button.Height, 24, "#000000")
 	yOffset += buttonH + margin
 
 	xOffset := margin

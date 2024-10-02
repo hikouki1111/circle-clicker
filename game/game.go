@@ -14,7 +14,6 @@ var (
 
 func Start() {
 	canvas = document.Call("getElementById", "main-canvas")
-
 	resizeCanvas()
 	global.Call("addEventListener", "resize", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		resizeCanvas()
@@ -43,9 +42,5 @@ func resizeCanvas() {
 }
 
 func tick() {
-	drawScreenTick()
-}
-
-func drawScreenTick() {
 	screen.CurrentScreen.Render(global, canvas, document)
 }

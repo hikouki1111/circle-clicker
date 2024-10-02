@@ -1,7 +1,7 @@
 package item
 
 var (
-	Items        []Item
+	Items        []*Item
 	Circles      int
 	TotalCircles int
 )
@@ -10,10 +10,10 @@ type Item struct {
 	Name     string
 	InitCost int
 	Cost     int
-	OnBuy    func(i *Item)
-	OnUpdate func(i *Item)
+	OnBuy    func() bool
+	OnUpdate func()
 }
 
 func (i *Item) Register() {
-	Items = append(Items, *i)
+	Items = append(Items, i)
 }
