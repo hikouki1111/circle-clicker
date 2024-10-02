@@ -178,6 +178,10 @@ func GameRender(global, canvas, document js.Value) {
 		iYOffset += button.Height + margin
 	}
 
+	text = fmt.Sprintf("Total %d", item.TotalCircles)
+	w, h := utility.GetFontSize(text, detailSize)
+	utility.DrawFilledText(text, (float32(canvas.Get("width").Float())-w*2)-margin, float32(canvas.Get("height").Float())-(h/2+margin), detailSize, "#ffffff", shadowFunc)
+
 	utility.EndRender()
 	lastCircles = item.Circles
 }
