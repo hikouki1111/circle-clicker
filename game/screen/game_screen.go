@@ -40,29 +40,31 @@ func GameOnInit(global, canvas, document js.Value) {
 		i, err := strconv.Atoi(cookies["multiplier"])
 		if err == nil {
 			item.Multiplier = i
-		} else {
-			fmt.Println(err)
 		}
 
 		i, err = strconv.Atoi(cookies["circles"])
 		if err == nil {
 			item.Circles = i
-		} else {
-			fmt.Println(err)
 		}
 
 		i, err = strconv.Atoi(cookies["clickers"])
 		if err == nil {
 			item.Clickers = i
-		} else {
-			fmt.Println(err)
 		}
 
 		i, err = strconv.Atoi(cookies["totalcircles"])
 		if err == nil {
 			item.TotalCircles = i
-		} else {
-			fmt.Println(err)
+		}
+
+		b, err := parseBool(cookies["waveanimation"])
+		if err == nil {
+			WaveAnimation = b
+		}
+
+		b, err = parseBool(cookies["countupanimation"])
+		if err == nil {
+			CountUPAnimation = b
 		}
 	}
 	lastCircles = item.Circles
@@ -206,6 +208,8 @@ func storeCookie(document js.Value) {
 	document.Set("cookie", fmt.Sprintf("circles=%d;", item.Circles))
 	document.Set("cookie", fmt.Sprintf("clickers=%d;", item.Clickers))
 	document.Set("cookie", fmt.Sprintf("totalcircles=%d;", item.TotalCircles))
+	document.Set("cookie", fmt.Sprintf("waveanimation=%t;", WaveAnimation))
+	document.Set("cookie", fmt.Sprintf("countupanimation=%t;", CountUPAnimation))
 }
 
 func parseCookie(document js.Value) map[string]string {
@@ -225,6 +229,17 @@ func parseCookie(document js.Value) map[string]string {
 	}
 
 	return cookies
+}
+
+func parseBool(boolStr string) (bool, error) {
+	boolStr = strings.ToLower(boolStr)
+	if boolStr == "true" {
+		return true, nil
+	} else if boolStr == "false" {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("error")
 }
 
 func updateAnims() {
