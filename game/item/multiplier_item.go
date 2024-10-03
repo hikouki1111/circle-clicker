@@ -21,7 +21,9 @@ func MultiplierItem() *Item {
 	}
 
 	i.OnUpdate = func() {
-		i.Cost = Multiplier * (i.InitCost*2)
+		if Multiplier > 1 {
+			i.Cost = Multiplier * (i.InitCost * Multiplier)
+		}
 	}
 
 	return i

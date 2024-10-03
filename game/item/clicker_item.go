@@ -26,7 +26,10 @@ func ClickerItem() *Item {
 	}
 
 	i.OnUpdate = func() {
-		i.Cost = (Clickers + 1) * (i.InitCost*2)
+		if Clickers > 0 {
+			i.Cost = Clickers * (i.InitCost * (Clickers + 1))
+		}
+
 		if stopwatch.IsFinished(1000, true) {
 			Circles += Clickers * Multiplier
 			TotalCircles += Clickers * Multiplier
